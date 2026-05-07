@@ -1233,12 +1233,20 @@ func (c *codec) docLink(link string, model *api.API, scopes []string) (string, e
 			return result, nil
 		}
 	}
+	localId := fmt.Sprintf(".%s", link)
 	packageName := ""
+	result, err := c.tryDocLinkWithId(localId, model, packageName)
+	if err != nil {
+		return "", err
+	}
+	if result != "" {
+		return result, nil
+	}
 	if len(scopes) > 0 {
 		packageName = scopes[len(scopes)-1]
+		return c.tryDocLinkWithId(localId, model, packageName)
 	}
-	localId := fmt.Sprintf(".%s", link)
-	return c.tryDocLinkWithId(localId, model, packageName)
+	return "", nil
 }
 
 func (c *codec) tryDocLinkWithId(id string, model *api.API, scope string) (string, error) {
